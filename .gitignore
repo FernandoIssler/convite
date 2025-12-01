@@ -1,0 +1,7 @@
+node_modules/
+rsvp.db
+.DS_Store
+*.log
+.env
+.htaccess
+config.php

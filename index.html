@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Convite de Formatura | GTI</title>
+    <meta
+      name="description"
+      content="Convite interativo e tecnológico para a cerimônia de formatura em Gestão da Tecnologia da Informação."
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <canvas id="matrix-bg"></canvas>
+
+    <div class="page-shell">
+      <header class="hero" id="topo">
+        <nav class="nav">
+          <div class="nav__brand">
+            <span class="nav__brand-tag">GTI</span>
+            <span class="nav__brand-name">Formatura</span>
+          </div>
+          <div class="nav__links">
+            <a href="#sobre" class="nav__link">Sobre</a>
+            <a href="#detalhes" class="nav__link">Detalhes</a>
+            <a href="#timeline" class="nav__link">Linha do tempo</a>
+            <a href="#rsvp" class="nav__link nav__link--primary">Confirmar presença</a>
+          </div>
+        </nav>
+
+        <section class="hero__content">
+          <div class="hero__left">
+            <p class="hero__eyebrow">Convite • Gestão da Tecnologia da Informação</p>
+            <h1 class="hero__title">
+              Uma jornada de <span class="hero__title-gradient">bits, bytes</span> e conquistas.
+            </h1>
+            <p class="hero__subtitle">
+              Depois de muitos commits, deploys na madrugada e cafés, chegou a hora de
+              fazer o <span class="u-highlight">deploy oficial da formatura</span>.
+              Você está convidado(a) para celebrar esse momento comigo.
+            </p>
+
+            <div class="hero__badges">
+              <div class="hero-badge">
+                <span class="hero-badge__label">Cerimônia</span>
+                <span class="hero-badge__value" id="hero-date">__/__/____</span>
+              </div>
+              <div class="hero-badge">
+                <span class="hero-badge__label">Local</span>
+                <span class="hero-badge__value" id="hero-place">Defina aqui</span>
+              </div>
+              <div class="hero-badge hero-badge--accent">
+                <span class="hero-badge__label">Contagem regressiva</span>
+                <span class="hero-badge__value" id="countdown">
+                  00d · 00h · 00m · 00s
+                </span>
+              </div>
+            </div>
+
+            <div class="hero__actions">
+              <a href="#rsvp" class="button button--primary">
+                Confirmar presença
+                <span class="button__pulse"></span>
+              </a>
+              <a href="#detalhes" class="button button--ghost">Ver detalhes da cerimônia</a>
+            </div>
+
+            <div class="hero__meta">
+              <span class="hero__meta-pill" id="hero-name">Seu Nome, GTI</span>
+              <span class="hero__meta-pill">Versão 1.0 • Convite interativo</span>
+            </div>
+          </div>
+
+          <div class="hero__right">
+            <div class="hero-photo">
+              <div class="hero-photo__frame">
+                <img
+                  id="hero-photo-img"
+                  src="./foto.jpg"
+                  alt="Foto de Seu Nome, formando em Gestão da Tecnologia da Informação"
+                />
+              </div>
+            </div>
+
+            <div class="hologram-card">
+              <div class="hologram-card__orbit"></div>
+              <div class="hologram-card__core">
+                <div class="hologram-card__avatar">
+                  <div class="avatar-circle">
+                    <span class="avatar-initials">GTI</span>
+                  </div>
+                </div>
+                <div class="hologram-card__info">
+                  <p class="hologram-card__hello">Olá, mundo! 👋</p>
+                  <p class="hologram-card__name" id="card-name">Seu Nome</p>
+                  <p class="hologram-card__role">Gestão da Tecnologia da Informação</p>
+                  <div class="hologram-card__tags">
+                    <span class="chip">#formatura</span>
+                    <span class="chip">#tecnologia</span>
+                    <span class="chip">#novoCapítulo</span>
+                  </div>
+                </div>
+              </div>
+              <div class="hologram-card__footer">
+                <span class="status status--online">status: online</span>
+                <span class="status">build: conclusão do curso</span>
+              </div>
+            </div>
+
+            <div class="code-panel">
+              <div class="code-panel__header">
+                <span class="code-dot code-dot--red"></span>
+                <span class="code-dot code-dot--yellow"></span>
+                <span class="code-dot code-dot--green"></span>
+                <span class="code-panel__title">invite.json</span>
+              </div>
+              <pre class="code-panel__body"><code id="invite-snippet">
+{
+  "graduate": "Seu Nome",
+  "course": "Gestão da Tecnologia da Informação",
+  "event": {
+    "type": "Cerimônia de formatura",
+    "date": "2025-12-01T19:30:00",
+    "place": "Atualize aqui"
+  },
+  "guest": "Você",
+  "action": "Confirmar presença e celebrar comigo 🎓"
+}
+              </code></pre>
+            </div>
+          </div>
+        </section>
+      </header>
+
+      <main>
+        <section class="section" id="sobre">
+          <div class="section__header">
+            <p class="section__eyebrow">Sobre esta conquista</p>
+            <h2 class="section__title">Da primeira linha de código ao grande dia.</h2>
+            <p class="section__subtitle">
+              Cada semestre foi como um novo sprint. Agora chegamos ao release mais especial:
+              minha formatura em <span class="u-highlight">Gestão da Tecnologia da Informação</span>.
+            </p>
+          </div>
+
+          <div class="grid grid--about">
+            <article class="card card--gradient">
+              <h3 class="card__title">Stack da jornada</h3>
+              <p class="card__text">
+                Foram anos aprendendo a conectar pessoas, processos e tecnologia. Entre
+                infra, gestão de projetos, bancos de dados e inovação, o objetivo sempre foi
+                o mesmo: <span class="u-highlight">resolver problemas reais com tecnologia</span>.
+              </p>
+              <p class="card__text" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(55, 65, 81, 0.5);">
+                Atualmente trabalho como <span class="u-highlight">Analista de Sistema do UNIAENE</span>, 
+                aplicando na prática tudo que aprendi durante a graduação. Sou também 
+                <span class="u-highlight">Microsoft Learn Student Ambassadors ALPHA</span> e líder de classe, 
+                desenvolvendo projetos que impactam a comunidade acadêmica.
+              </p>
+              <div class="pill-row" style="margin-top: 16px;">
+                <span class="pill">PHP</span>
+                <span class="pill">JavaScript</span>
+                <span class="pill">MySQL</span>
+                <span class="pill">React</span>
+                <span class="pill">Node.js</span>
+                <span class="pill">Git/Github</span>
+                <span class="pill">Cloud (AWS/Azure)</span>
+                <span class="pill">Full Stack</span>
+              </div>
+              <p class="card__text" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(55, 65, 81, 0.5); font-size: 13px; color: #9ca3af;">
+                <strong style="color: #e5f0ff;">Projetos desenvolvidos:</strong> Sistema de Controle das Atléticas (FADBA), 
+                Sistema de Busca de Matrícula, TradeCalc (Gestão de Carteiras), OneLex (Gestão para Escritórios), 
+                e ecossistema tecnológico completo para empresas.
+              </p>
+            </article>
+
+            <article class="card">
+              <h3 class="card__title">Release notes</h3>
+              <ul class="timeline-mini">
+                <li>
+                  <span class="dot"></span>
+                  <div>
+                    <p class="timeline-mini__label">v1.0.0 • Full Stack PHP Developer</p>
+                    <p class="timeline-mini__desc">Formação completa em PHP pela UPINSIDE (2019-2021), atualizada para PHP 8.2 em 2023. Primeiros projetos Full Stack e início da transição profissional para tecnologia.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="dot"></span>
+                  <div>
+                    <p class="timeline-mini__label">v2.0.0 • Projetos reais & GTI</p>
+                    <p class="timeline-mini__desc">Desenvolvimento de sistemas para FADBA (Atléticas, Busca de Matrícula), TradeCalc, OneLex. Início da graduação em GTI e Database Foundations pela Oracle (2023).</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="dot"></span>
+                  <div>
+                    <p class="timeline-mini__label">v3.0.0 • Microsoft Ambassador & React</p>
+                    <p class="timeline-mini__desc">Admitido como Microsoft Learn Student Ambassador ALPHA (2024), formação em JavaScript e React Native pela Rocketseat, e agora Analista de Sistema no UNIAENE.</p>
+                  </div>
+                </li>
+                <li>
+                  <span class="dot"></span>
+                  <div>
+                    <p class="timeline-mini__label">v4.0.0 • Formatura GTI</p>
+                    <p class="timeline-mini__desc">Conclusão da graduação em Gestão da Tecnologia da Informação. Uma jornada de código, inovação e transformação digital chegando ao grande dia! 🎓</p>
+                  </div>
+                </li>
+              </ul>
+            </article>
+          </div>
+        </section>
+
+        <section class="section section--split" id="detalhes">
+          <div class="section__header section__header--left">
+            <p class="section__eyebrow">Detalhes da cerimônia</p>
+            <h2 class="section__title">
+              Salve a data. <span class="section__title-gradient">O commit final está chegando.</span>
+            </h2>
+          </div>
+
+          <div class="grid grid--details">
+            <div class="card card--glass">
+              <h3 class="card__title">Configurações do evento</h3>
+              <dl class="details-list">
+                <div class="details-list__row">
+                  <dt>Data</dt>
+                  <dd id="detail-date">__/__/____</dd>
+                </div>
+                <div class="details-list__row">
+                  <dt>Horário</dt>
+                  <dd id="detail-time">__/__/____</dd>
+                </div>
+                <div class="details-list__row">
+                  <dt>Local</dt>
+                  <dd id="detail-place">UNIAENE - Centro Universitário Adventista de Ensino do Nordeste</dd>
+                </div>
+                <div class="details-list__row">
+                  <dt>Endereço</dt>
+                  <dd>BR 101, Km 197, Cachoeira - BA<br>CEP 44300-000</dd>
+                </div>
+                <div class="details-list__row">
+                  <dt>Traje</dt>
+                  <dd>Social / Esporte fino</dd>
+                </div>
+              </dl>
+
+              <div class="callout">
+                <p class="callout__title">Chegue com alguns minutos de antecedência</p>
+                <p class="callout__text">
+                  Assim você consegue se acomodar com calma, aproveitar toda a cerimônia e,
+                  claro, garantir aquele registro especial.
+                </p>
+              </div>
+            </div>
+
+            <div class="card card--map">
+              <h3 class="card__title">Como chegar</h3>
+              <p class="card__text">
+                O UNIAENE está localizado no Recôncavo Baiano, às margens da BR 101, a 5 km da sede do município de Cachoeira, 52 km de Feira de Santana e 123 km de Salvador. O acesso é fácil pela rodovia BR 101.
+              </p>
+              <div class="map-container">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.102345678901!2d-38.970052!3d-12.570461!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x715c797eb654c1b%3A0x692fb199265254b0!2sUNIAENE%20-%20Centro%20Universit%C3%A1rio%20Adventista%20de%20Ensino%20do%20Nordeste!5e0!3m2!1spt-BR!2sbr!4v1630000000000!5m2!1spt-BR!2sbr"
+                  width="100%"
+                  height="100%"
+                  style="border:0;"
+                  allowfullscreen=""
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  class="map-iframe"
+                  title="Localização do UNIAENE - BR 101, Km 197, Cachoeira - BA"
+                ></iframe>
+                <div class="map-grid-overlay">
+                  <span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+              <div class="map-links">
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="button button--ghost button--small"
+                  id="btn-google-maps"
+                >
+                  Abrir no Google Maps
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  rel="noreferrer"
+                  class="button button--ghost button--small"
+                  id="btn-uber"
+                >
+                  Chamar um Uber
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section" id="timeline">
+          <div class="section__header">
+            <p class="section__eyebrow">Linha do tempo da noite</p>
+            <h2 class="section__title">Porque até a festa merece um bom roadmap.</h2>
+          </div>
+
+          <ol class="timeline">
+            <li class="timeline__item">
+              <div class="timeline__time">T -30 min</div>
+              <div class="timeline__content">
+                <h3 class="timeline__title">Check-in & recepção</h3>
+                <p class="timeline__desc">
+                  Chegada dos convidados, escolha dos lugares e primeiras fotos desta nova
+                  fase.
+                </p>
+              </div>
+            </li>
+            <li class="timeline__item">
+              <div class="timeline__time">T 0</div>
+              <div class="timeline__content">
+                <h3 class="timeline__title">Início da cerimônia</h3>
+                <p class="timeline__desc">
+                  Discursos, agradecimentos e momentos emocionantes para lembrar de toda a
+                  jornada.
+                </p>
+              </div>
+            </li>
+            <li class="timeline__item">
+              <div class="timeline__time">T +45 min</div>
+              <div class="timeline__content">
+                <h3 class="timeline__title">Colação & fotos oficiais</h3>
+                <p class="timeline__desc">
+                  O grande momento de subir ao palco, receber o diploma e registrar tudo.
+                </p>
+              </div>
+            </li>
+            <li class="timeline__item">
+              <div class="timeline__time">T +90 min</div>
+              <div class="timeline__content">
+                <h3 class="timeline__title">Celebração</h3>
+                <p class="timeline__desc">
+                  Abraços, fotos, conversas e muitos planos para o próximo capítulo.
+                </p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section class="section section--accent" id="rsvp">
+          <div class="section__header">
+            <p class="section__eyebrow">Confirme sua presença</p>
+            <h2 class="section__title">
+              Me conta se você vem para esta nova versão da minha história.
+            </h2>
+            <p class="section__subtitle">
+              Preencha o formulário abaixo para confirmar sua presença. Sua confirmação será salva automaticamente no sistema! 🎉
+            </p>
+            <div class="callout" style="margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+              <p class="callout__title">💡 Como funciona a contagem</p>
+              <p class="callout__text" style="margin: 0;">
+                <strong>Você conta como 1 pessoa</strong> na confirmação. Se você trouxer acompanhantes, eles serão <strong>somados a você</strong>. 
+                Por exemplo: você (1) + 2 acompanhantes = <strong>3 pessoas no total</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div id="rsvp-feedback" class="rsvp-feedback" style="display: none;"></div>
+
+          <div class="grid grid--rsvp">
+            <form class="card card--form" id="rsvp-form">
+              <div class="form-row">
+                <label for="guest-name">Seu nome</label>
+                <input
+                  type="text"
+                  id="guest-name"
+                  name="guest-name"
+                  placeholder="Digite seu nome completo"
+                  required
+                />
+              </div>
+              <div class="form-row">
+                <label for="guest-companions">
+                  Quantidade de acompanhantes
+                  <span style="font-size: 11px; color: #9ca3af; font-weight: normal; display: block; margin-top: 4px;">
+                    (Você já está contado como 1 pessoa. Informe quantos acompanhantes virão com você)
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  id="guest-companions"
+                  name="guest-companions"
+                  min="0"
+                  max="10"
+                  value="0"
+                  placeholder="0"
+                />
+              </div>
+              <div class="form-row form-row--inline">
+                <div class="form-row__col">
+                  <label>Você vem?</label>
+                  <div class="pill-toggle" id="attendance-toggle">
+                    <button type="button" data-value="sim" class="pill-toggle__option is-active">
+                      Sim, vou! 🎉
+                    </button>
+                    <button type="button" data-value="nao" class="pill-toggle__option">
+                      Infelizmente não 😢
+                    </button>
+                  </div>
+                  <input type="hidden" id="attendance" name="attendance" value="sim" />
+                </div>
+              </div>
+              <div class="form-row">
+                <label for="guest-message">Deixe uma mensagem</label>
+                <textarea
+                  id="guest-message"
+                  name="guest-message"
+                  rows="4"
+                  placeholder="Escreva uma mensagem especial (opcional)"
+                ></textarea>
+              </div>
+
+              <button type="submit" class="button button--primary button--full">
+                Confirmar presença
+              </button>
+            </form>
+
+            <div class="card card--preview">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                <span style="font-size: 20px;">📝</span>
+                <h3 class="card__title" style="margin: 0;">Prévia da mensagem (opcional)</h3>
+              </div>
+              <p class="card__text" style="font-size: 13px; color: #9ca3af; margin-bottom: 16px;">
+                <strong style="color: #e5f0ff;">Esta é uma funcionalidade separada da confirmação de presença.</strong><br>
+                Você pode gerar uma mensagem personalizada para me enviar por WhatsApp, e-mail ou qualquer outro meio, 
+                caso queira enviar uma mensagem especial além da confirmação automática.
+              </p>
+              <div style="background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid rgba(34, 197, 94, 0.5);">
+                <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                  💡 <strong style="color: #22c55e;">Dica:</strong> A confirmação de presença já foi salva automaticamente no sistema. 
+                  Esta mensagem é apenas se você quiser enviar algo adicional.
+                </p>
+              </div>
+              <pre class="preview-box" id="preview-message">
+Olá, [Seu Nome]! ✅
+
+Eu, [Nome do convidado], confirmo minha presença na sua formatura de GTI! 🎓
+
+Acompanhantes: 0
+
+Mensagem: (sua mensagem aparecerá aqui)
+              </pre>
+              <button class="button button--ghost button--full" id="btn-copy">
+                Copiar mensagem
+              </button>
+              <p class="preview-hint" id="copy-hint">Clique para copiar o texto gerado.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p class="footer__text">
+          Desenvolvido com HTML, CSS e JavaScript — porque formatura de GTI merece um
+          convite à altura.
+        </p>
+        <p class="footer__text footer__text--small">
+          Personalize datas, horários, local e textos diretamente no código.
+        </p>
+        <a href="#topo" class="back-to-top">Voltar ao topo ↑</a>
+      </footer>
+    </div>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
+
+

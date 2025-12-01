@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - Confirmações de Presença | GTI</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <style>
+      .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+      .admin-header {
+        margin-bottom: 32px;
+      }
+
+      .admin-title {
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        background: linear-gradient(120deg, #22c55e, #22d3ee);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+
+      .stat-card {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        border-radius: 12px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      .stat-label {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #22c55e;
+      }
+
+      .rsvp-list {
+        display: grid;
+        gap: 16px;
+      }
+
+      .rsvp-item {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        border-radius: 12px;
+        padding: 20px;
+        backdrop-filter: blur(10px);
+      }
+
+      .rsvp-item-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+      }
+
+      .rsvp-name {
+        font-size: 18px;
+        font-weight: 600;
+        color: #e5f0ff;
+      }
+
+      .rsvp-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      .rsvp-badge--sim {
+        background: rgba(34, 197, 94, 0.2);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.4);
+      }
+
+      .rsvp-badge--nao {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+        border: 1px solid rgba(239, 68, 68, 0.4);
+      }
+
+      .rsvp-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 14px;
+        color: #9ca3af;
+        margin-bottom: 12px;
+      }
+
+      .rsvp-message {
+        font-size: 14px;
+        color: #e5e7eb;
+        font-style: italic;
+        padding: 12px;
+        background: rgba(2, 6, 23, 0.5);
+        border-radius: 8px;
+        border-left: 3px solid #22c55e;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+      }
+
+      .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+      }
+
+      .refresh-btn {
+        margin-bottom: 24px;
+        padding: 10px 20px;
+        background: linear-gradient(120deg, #22c55e, #22d3ee);
+        color: #020617;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.2s;
+      }
+
+      .refresh-btn:hover {
+        transform: scale(1.05);
+      }
+
+      .loading {
+        text-align: center;
+        padding: 40px;
+        color: #9ca3af;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="matrix-bg"></canvas>
+    <div class="page-shell">
+      <div class="admin-container">
+        <div class="admin-header">
+          <h1 class="admin-title">📊 Painel de Confirmações</h1>
+          <p style="color: #9ca3af; margin-bottom: 16px;">
+            Visualize todas as confirmações de presença recebidas
+          </p>
+          <button class="refresh-btn" onclick="loadData()">🔄 Atualizar</button>
+        </div>
+
+        <div id="stats-container" class="admin-stats">
+          <div class="loading">Carregando estatísticas...</div>
+        </div>
+
+        <div id="rsvp-container" class="rsvp-list">
+          <div class="loading">Carregando confirmações...</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="./main.js"></script>
+    <script>
+      // Inicializar fundo Matrix
+      if (typeof initMatrixBackground === 'function') {
+        initMatrixBackground();
+      }
+
+      async function loadStats() {
+        try {
+          const response = await fetch('./api/stats.php');
+          const result = await response.json();
+          
+          if (result.success) {
+            const stats = result.data;
+            const statsHTML = `
+              <div class="stat-card">
+                <div class="stat-label">Total de Confirmações</div>
+                <div class="stat-value">${stats.total}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Confirmados</div>
+                <div class="stat-value">${stats.confirmados}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Não Confirmados</div>
+                <div class="stat-value">${stats.naoConfirmados}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Total de Pessoas</div>
+                <div class="stat-value">${stats.totalPessoas}</div>
+              </div>
+            `;
+            document.getElementById('stats-container').innerHTML = statsHTML;
+          }
+        } catch (error) {
+          console.error('Erro ao carregar estatísticas:', error);
+          document.getElementById('stats-container').innerHTML = 
+            '<div class="stat-card"><div class="stat-label">Erro ao carregar</div></div>';
+        }
+      }
+
+      async function loadRSVPs() {
+        try {
+          const response = await fetch('./api/rsvps.php');
+          const result = await response.json();
+          
+          if (result.success) {
+            const rsvps = result.data;
+            
+            if (rsvps.length === 0) {
+              document.getElementById('rsvp-container').innerHTML = `
+                <div class="empty-state">
+                  <div class="empty-state-icon">📭</div>
+                  <p>Nenhuma confirmação recebida ainda.</p>
+                </div>
+              `;
+              return;
+            }
+
+            const rsvpsHTML = rsvps.map(rsvp => {
+              const date = new Date(rsvp.createdAt).toLocaleString('pt-BR');
+              const badgeClass = rsvp.attendance === 'sim' ? 'rsvp-badge--sim' : 'rsvp-badge--nao';
+              const badgeText = rsvp.attendance === 'sim' ? '✅ Confirmado' : '❌ Não vai';
+              
+              return `
+                <div class="rsvp-item">
+                  <div class="rsvp-item-header">
+                    <div class="rsvp-name">${rsvp.guestName}</div>
+                    <span class="rsvp-badge ${badgeClass}">${badgeText}</span>
+                  </div>
+                  <div class="rsvp-meta">
+                    <span>👥 Acompanhantes: ${rsvp.companions}</span>
+                    <span>📅 ${date}</span>
+                  </div>
+                  ${rsvp.message ? `
+                    <div class="rsvp-message">
+                      "${rsvp.message}"
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }).join('');
+
+            document.getElementById('rsvp-container').innerHTML = rsvpsHTML;
+          }
+        } catch (error) {
+          console.error('Erro ao carregar RSVPs:', error);
+          document.getElementById('rsvp-container').innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">⚠️</div>
+              <p>Erro ao carregar confirmações. Verifique se o servidor está rodando.</p>
+            </div>
+          `;
+        }
+      }
+
+      function loadData() {
+        loadStats();
+        loadRSVPs();
+      }
+
+      // Carregar dados ao abrir a página
+      document.addEventListener('DOMContentLoaded', loadData);
+
+      // Atualizar automaticamente a cada 30 segundos
+      setInterval(loadData, 30000);
+    </script>
+  </body>
+</html>
+

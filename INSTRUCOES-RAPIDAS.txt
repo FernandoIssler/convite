@@ -1,0 +1,64 @@
+═══════════════════════════════════════════════════════════════
+  🎓 CONVITE FORMATURA GTI - INSTRUÇÕES RÁPIDAS (XAMPP)
+═══════════════════════════════════════════════════════════════
+
+📋 PASSO A PASSO:
+
+1. COPIAR PROJETO PARA XAMPP
+   ──────────────────────────
+   Copie a pasta "invite" para:
+   • Windows: C:\xampp\htdocs\invite
+   • Mac: /Applications/XAMPP/htdocs/invite
+   • Linux: /opt/lampp/htdocs/invite
+
+2. INICIAR XAMPP
+   ──────────────
+   • Abra o XAMPP Control Panel
+   • Clique em "Start" no Apache
+   • Clique em "Start" no MySQL
+
+3. CRIAR BANCO DE DADOS
+   ─────────────────────
+   • Abra: http://localhost/phpmyadmin
+   • Clique em "Novo" (menu lateral)
+   • Nome: convite_formatura
+   • Collation: utf8mb4_unicode_ci
+   • Clique em "Criar"
+   • Selecione o banco "convite_formatura"
+   • Clique na aba "SQL"
+   • Cole o conteúdo do arquivo "database.sql"
+   • Clique em "Executar"
+
+4. CONFIGURAR SEUS DADOS
+   ──────────────────────
+   • Abra o arquivo "main.js"
+   • Edite a constante CONFIG com seus dados:
+     - Seu nome
+     - Data e horário da cerimônia
+     - Local da cerimônia
+     - Links do Google Maps e Uber
+   • Salve o arquivo
+
+5. ADICIONAR SUA FOTO
+   ───────────────────
+   • Coloque uma foto sua na pasta do projeto
+   • Nome do arquivo: foto.jpg
+   • (Ou atualize o caminho no CONFIG)
+
+6. ACESSAR O SITE
+   ───────────────
+   • Site principal: http://localhost/invite/
+   • Painel admin: http://localhost/invite/admin
+
+═══════════════════════════════════════════════════════════════
+
+✅ PRONTO! Seu convite está funcionando!
+
+📊 Para ver as confirmações: http://localhost/invite/admin
+
+🌐 Para compartilhar na sua rede:
+   • Descubra seu IP (ipconfig no Windows, ifconfig no Mac/Linux)
+   • Acesse de outro dispositivo: http://SEU_IP/invite/
+
+═══════════════════════════════════════════════════════════════
+

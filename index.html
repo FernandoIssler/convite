@@ -15,6 +15,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;600&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.2.2/build/qrcode.min.js"></script>
   </head>
   <body>
     <canvas id="matrix-bg"></canvas>
@@ -23,8 +24,7 @@
       <header class="hero" id="topo">
         <nav class="nav">
           <div class="nav__brand">
-            <span class="nav__brand-tag">GTI</span>
-            <span class="nav__brand-name">Formatura</span>
+            <img src="./logo.png" alt="Logo do curso" class="nav__brand-logo" />
           </div>
           <div class="nav__links">
             <a href="#sobre" class="nav__link">Sobre</a>
@@ -432,35 +432,42 @@
               </button>
             </form>
 
-            <div class="card card--preview">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                <span style="font-size: 20px;">📝</span>
-                <h3 class="card__title" style="margin: 0;">Prévia da mensagem (opcional)</h3>
+            <div class="card card--pix">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+                <span style="font-size: 24px;">💚</span>
+                <h3 class="card__title" style="margin: 0;">Contribua com o formando</h3>
               </div>
-              <p class="card__text" style="font-size: 13px; color: #9ca3af; margin-bottom: 16px;">
-                <strong style="color: #e5f0ff;">Esta é uma funcionalidade separada da confirmação de presença.</strong><br>
-                Você pode gerar uma mensagem personalizada para me enviar por WhatsApp, e-mail ou qualquer outro meio, 
-                caso queira enviar uma mensagem especial além da confirmação automática.
+              <p class="card__text" style="font-size: 14px; color: #e5f0ff; margin-bottom: 12px; line-height: 1.6;">
+                Sua presença já é um presente incrível! Mas se quiser contribuir com um valor simbólico para ajudar nas despesas da formatura, ficarei muito grato. 💙
               </p>
-              <div style="background: rgba(15, 23, 42, 0.5); padding: 12px; border-radius: 8px; margin-bottom: 12px; border-left: 3px solid rgba(34, 197, 94, 0.5);">
+              <p class="card__text" style="font-size: 13px; color: #9ca3af; margin-bottom: 20px;">
+                Escaneie o QR Code abaixo ou copie a chave PIX para fazer sua contribuição de qualquer valor. Toda ajuda é bem-vinda! 🎓
+              </p>
+              
+              <div class="pix-container">
+                <div class="pix-qr-wrapper">
+                  <img src="./pix.png" alt="QR Code PIX" class="img-fluid" width="250"/>
+                </div>
+                <div class="pix-info">
+                  <div class="pix-key-section">
+                    <label class="pix-label">Chave PIX (CPF):</label>
+                    <div class="pix-key-display">
+                      <code class="pix-key-code" id="pix-key">02482451558</code>
+                      <button class="pix-copy-btn" id="btn-copy-pix" title="Copiar chave PIX">
+                        <span>📋</span>
+                      </button>
+                    </div>
+                  </div>
+                  <p class="pix-hint" id="pix-copy-hint">Clique no ícone para copiar a chave PIX</p>
+                </div>
+              </div>
+
+              <div style="background: rgba(34, 197, 94, 0.1); padding: 12px; border-radius: 8px; margin-top: 20px; border-left: 3px solid rgba(34, 197, 94, 0.5);">
                 <p style="font-size: 12px; color: #9ca3af; margin: 0;">
-                  💡 <strong style="color: #22c55e;">Dica:</strong> A confirmação de presença já foi salva automaticamente no sistema. 
-                  Esta mensagem é apenas se você quiser enviar algo adicional.
+                  💡 <strong style="color: #22c55e;">Obrigado!</strong> Sua contribuição ajuda muito a tornar este momento ainda mais especial. 
+                  Qualquer valor é muito bem-vindo e será recebido com muito carinho! 🙏
                 </p>
               </div>
-              <pre class="preview-box" id="preview-message">
-Olá, [Seu Nome]! ✅
-
-Eu, [Nome do convidado], confirmo minha presença na sua formatura de GTI! 🎓
-
-Acompanhantes: 0
-
-Mensagem: (sua mensagem aparecerá aqui)
-              </pre>
-              <button class="button button--ghost button--full" id="btn-copy">
-                Copiar mensagem
-              </button>
-              <p class="preview-hint" id="copy-hint">Clique para copiar o texto gerado.</p>
             </div>
           </div>
         </section>

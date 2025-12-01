@@ -68,6 +68,12 @@ textarea {
   font-family: "JetBrains Mono", monospace;
 }
 
+.nav__brand-logo {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+}
+
 .nav__brand-tag {
   padding: 4px 10px;
   border-radius: 999px;
@@ -897,22 +903,117 @@ textarea {
   color: #020617;
 }
 
-.preview-box {
-  border-radius: 12px;
-  padding: 10px;
-  background: #020617;
-  border: 1px solid rgba(55, 65, 81, 0.9);
-  font-family: "JetBrains Mono", monospace;
-  font-size: 12px;
-  color: #e5e7eb;
-  white-space: pre-wrap;
-  min-height: 120px;
-  margin-bottom: 8px;
+/* ---------- Card PIX ---------- */
+.card--pix {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(34, 211, 238, 0.05));
+  border: 1px solid rgba(34, 197, 94, 0.2);
 }
 
-.preview-hint {
+.pix-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.pix-qr-wrapper {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pix-qr-wrapper canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+.pix-info {
+  width: 100%;
+}
+
+.pix-key-section {
+  margin-bottom: 12px;
+}
+
+.pix-label {
+  display: block;
   font-size: 12px;
   color: #9ca3af;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.pix-key-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.pix-key-code {
+  flex: 1;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  color: #e5f0ff;
+  word-break: break-all;
+  user-select: all;
+}
+
+.pix-copy-btn {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+.pix-copy-btn:hover {
+  background: rgba(34, 197, 94, 0.3);
+  border-color: rgba(34, 197, 94, 0.6);
+  transform: scale(1.05);
+}
+
+.pix-copy-btn:active {
+  transform: scale(0.95);
+}
+
+.pix-copy-btn span {
+  font-size: 16px;
+}
+
+.pix-hint {
+  font-size: 11px;
+  color: #6b7280;
+  text-align: center;
+  margin: 0;
+  transition: color 0.2s;
+}
+
+.pix-hint.copied {
+  color: #22c55e;
+}
+
+@media (max-width: 600px) {
+  .pix-qr-wrapper {
+    padding: 12px;
+  }
+  
+  .pix-key-code {
+    font-size: 12px;
+  }
 }
 
 /* ---------- Feedback RSVP ---------- */

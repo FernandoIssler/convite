@@ -330,6 +330,112 @@ Mensagem: ${customMessage}`;
   }
 }
 
+// --- Gerar código EMV do PIX --- //
+function generatePixEmv(cpf, name, city = "BRASILIA") {
+  // Remove caracteres não numéricos do CPF
+  const cleanCpf = cpf.replace(/\D/g, "");
+  
+  // Limita o nome a 25 caracteres (padrão PIX)
+  const merchantName = name.substring(0, 25).toUpperCase();
+  const merchantCity = city.substring(0, 15).toUpperCase();
+  
+  // Monta os campos do payload EMV
+  const payloadFormatIndicator = "000201"; // ID 00 + tamanho 02 + valor 01
+  const merchantAccountInfo = "26" + String(14 + cleanCpf.length + 2).padStart(2, "0") + "0014br.gov.bcb.pix01" + String(cleanCpf.length).padStart(2, "0") + cleanCpf; // ID 26 + tamanho + GUI + tamanho chave + chave
+  const merchantCategoryCode = "52040000"; // ID 52 + tamanho 04 + valor 0000
+  const transactionCurrency = "5303986"; // ID 53 + tamanho 03 + valor 986 (BRL)
+  const countryCode = "5802BR"; // ID 58 + tamanho 02 + valor BR
+  const merchantNameField = "59" + String(merchantName.length).padStart(2, "0") + merchantName; // ID 59 + tamanho + nome
+  const merchantCityField = "60" + String(merchantCity.length).padStart(2, "0") + merchantCity; // ID 60 + tamanho + cidade
+  const additionalDataField = "62070503***"; // ID 62 + tamanho 07 + template 05 + tamanho 02 + referência ***
+  
+  // Monta o payload sem CRC
+  const payloadWithoutCrc = payloadFormatIndicator + merchantAccountInfo + merchantCategoryCode + 
+                            transactionCurrency + countryCode + merchantNameField + merchantCityField + 
+                            additionalDataField;
+  
+  // Calcula CRC16 sobre o payload + campo 63 (sem o valor do CRC)
+  const payloadForCrc = payloadWithoutCrc + "6304";
+  const crc = calculateCRC16(payloadForCrc);
+  return payloadForCrc + crc;
+}
+
+// --- Calcular CRC16 (CCITT-FALSE) --- //
+function calculateCRC16(data) {
+  let crc = 0xffff;
+  const polynomial = 0x1021;
+  
+  for (let i = 0; i < data.length; i++) {
+    const byte = data.charCodeAt(i);
+    crc ^= (byte << 8);
+    
+    for (let j = 0; j < 8; j++) {
+      if (crc & 0x8000) {
+        crc = ((crc << 1) ^ polynomial) & 0xffff;
+      } else {
+        crc = (crc << 1) & 0xffff;
+      }
+    }
+  }
+  
+  return crc.toString(16).toUpperCase().padStart(4, "0");
+}
+
+// --- Inicializar PIX --- //
+function initPix() {
+  const qrCanvas = document.getElementById("pix-qrcode");
+  const copyBtn = document.getElementById("btn-copy-pix");
+  const copyHint = document.getElementById("pix-copy-hint");
+  const pixKey = document.getElementById("pix-key");
+  
+  if (!qrCanvas || !copyBtn || !pixKey) return;
+  
+  const pixCpf = "02482451558";
+  const pixName = CONFIG.graduateName || "Fernando Issler Silva";
+  const pixCity = "Cachoeira";
+  
+  // Gera o código EMV do PIX
+  const pixEmv = generatePixEmv(pixCpf, pixName, pixCity);
+  
+  // Gera o QR code
+  if (typeof QRCode !== "undefined") {
+    QRCode.toCanvas(qrCanvas, pixEmv, {
+      width: 250,
+      margin: 2,
+      color: {
+        dark: "#000000",
+        light: "#FFFFFF",
+      },
+    }, (error) => {
+      if (error) {
+        console.error("Erro ao gerar QR code:", error);
+      }
+    });
+  }
+  
+  // Copiar chave PIX
+  if (copyBtn && navigator.clipboard) {
+    copyBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(pixCpf);
+        if (copyHint) {
+          copyHint.textContent = "Chave PIX copiada! Agora é só colar no app do seu banco.";
+          copyHint.classList.add("copied");
+          setTimeout(() => {
+            copyHint.textContent = "Clique no ícone para copiar a chave PIX";
+            copyHint.classList.remove("copied");
+          }, 3000);
+        }
+      } catch (err) {
+        console.error("Erro ao copiar:", err);
+        if (copyHint) {
+          copyHint.textContent = "Não foi possível copiar automaticamente. Selecione o código manualmente.";
+        }
+      }
+    });
+  }
+}
+
 // --- Scroll suave para âncoras --- //
 function initSmoothScroll() {
   document.querySelectorAll('a[href^="#"]').forEach((link) => {
@@ -352,6 +458,7 @@ document.addEventListener("DOMContentLoaded", () => {
   applyConfig();
   initCountdown();
   initRsvp();
+  initPix();
   initSmoothScroll();
 });
 

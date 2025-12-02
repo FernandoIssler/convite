@@ -418,6 +418,32 @@
                 </div>
               </div>
               <div class="form-row">
+                <label>Quais eventos vai participar?</label>
+                <div class="choice-toggle" style="margin-top:8px;">
+                  <label class="choice" for="event-ceremony">
+                    <input type="checkbox" id="event-ceremony" />
+                    <span class="choice__pill">
+                      <span class="choice__icon">🎓</span>
+                      <span class="choice__text">
+                        <strong>Cerimônia</strong>
+                        <small>14/12 às 15h</small>
+                      </span>
+                    </span>
+                  </label>
+                  <label class="choice" for="event-culto">
+                    <input type="checkbox" id="event-culto" />
+                    <span class="choice__pill">
+                      <span class="choice__icon">🙏</span>
+                      <span class="choice__text">
+                        <strong>Culto de gratidão</strong>
+                        <small>12/12 às 19h</small>
+                      </span>
+                    </span>
+                  </label>
+                </div>
+                <p style="font-size:11px; color:#9ca3af; margin-top:6px;">Se marcar "Sim, vou", selecione ao menos um.</p>
+              </div>
+              <div class="form-row">
                 <label for="guest-message">Deixe uma mensagem</label>
                 <textarea
                   id="guest-message"
@@ -433,20 +459,28 @@
             </form>
 
             <div class="card card--pix">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
-                <span style="font-size: 24px;">💚</span>
-                <h3 class="card__title" style="margin: 0;">Contribua com o formando</h3>
-              </div>
-              <p class="card__text" style="font-size: 14px; color: #e5f0ff; margin-bottom: 12px; line-height: 1.6;">
-                Sua presença já é um presente incrível! Mas se quiser contribuir com um valor simbólico para ajudar nas despesas da formatura, ficarei muito grato. 💙
-              </p>
-              <p class="card__text" style="font-size: 13px; color: #9ca3af; margin-bottom: 20px;">
-                Escaneie o QR Code abaixo ou copie a chave PIX para fazer sua contribuição de qualquer valor. Toda ajuda é bem-vinda! 🎓
-              </p>
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                  <h3 class="card__title" style="margin: 0;">🎮 Surpresa</h3>
+                </div>
+                <p class="card__text" style="font-size: 13px; color: #9ca3af; margin-bottom: 12px;">Complete este jogo rápido para desbloquear uma surpresa.</p>
               
+              <!-- Mini-game memória para revelar surpresa -->
+              <div class="pix-game" id="pix-game">
+                <p class="pix-game__title">🎮 Jogo rápido — Memória</p>
+                <p class="pix-game__desc">Encontre os 3 pares em menos de 12 jogadas para desbloquear a surpresa.</p>
+                <div id="memory-grid" class="memory-grid" aria-hidden="false"></div>
+                <div class="pix-game__controls" style="margin-top:8px;">
+                  <button id="pix-game-reset" class="button button--primary">Reiniciar</button>
+                  <span id="memory-hint" style="font-size:12px; color:#9ca3af;">Jogadas: 0</span>
+                </div>
+                <p class="pix-game__hint">Toque/click em duas cartas para encontrar o par.</p>
+              </div>
+
+              <div id="pix-reveal" style="display:none;">
+                <h2 class="mt-5 text-center mb-5" style="margin-top: 20px; margin-bottom: 20px; text-align: center;">Surpresa desbloqueada! <span class="fs-1">😆</span> <br> Faça um PIX pro formando!!!</h2>
               <div class="pix-container">
                 <div class="pix-qr-wrapper">
-                  <img src="./pix.png" alt="QR Code PIX" class="img-fluid" width="250"/>
+                  <img src="pix.png" width="250">
                 </div>
                 <div class="pix-info">
                   <div class="pix-key-section">
@@ -463,10 +497,11 @@
               </div>
 
               <div style="background: rgba(34, 197, 94, 0.1); padding: 12px; border-radius: 8px; margin-top: 20px; border-left: 3px solid rgba(34, 197, 94, 0.5);">
-                <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                <p id="pix-donation-text" style="font-size: 12px; color: #9ca3af; margin: 0; display:none;">
                   💡 <strong style="color: #22c55e;">Obrigado!</strong> Sua contribuição ajuda muito a tornar este momento ainda mais especial. 
                   Qualquer valor é muito bem-vindo e será recebido com muito carinho! 🙏
                 </p>
+              </div>
               </div>
             </div>
           </div>

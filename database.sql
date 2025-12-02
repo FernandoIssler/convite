@@ -15,9 +15,13 @@ CREATE TABLE IF NOT EXISTS rsvps (
     guest_name VARCHAR(255) NOT NULL,
     companions INT DEFAULT 0,
     attendance ENUM('sim', 'nao') NOT NULL,
+    ceremony TINYINT(1) DEFAULT 0,
+    culto TINYINT(1) DEFAULT 0,
     message TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     INDEX idx_attendance (attendance),
+    INDEX idx_ceremony (ceremony),
+    INDEX idx_culto (culto),
     INDEX idx_created_at (created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

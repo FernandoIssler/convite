@@ -29,6 +29,8 @@ if (!$data) {
 $guestName = trim($data['guestName'] ?? '');
 $companions = isset($data['companions']) ? (int)$data['companions'] : 0;
 $attendance = $data['attendance'] ?? '';
+$attendCeremony = !empty($data['attendCeremony']) ? 1 : 0;
+$attendCulto = !empty($data['attendCulto']) ? 1 : 0;
 $message = isset($data['message']) ? trim($data['message']) : null;
 
 if (empty($guestName)) {
@@ -37,6 +39,11 @@ if (empty($guestName)) {
 
 if ($attendance !== 'sim' && $attendance !== 'nao') {
     sendError('Confirmação de presença inválida');
+}
+
+// Se marcou que vai, precisa selecionar ao menos um evento
+if ($attendance === 'sim' && ($attendCeremony === 0 && $attendCulto === 0)) {
+    sendError('Selecione ao menos um evento (Cerimônia e/ou Culto).');
 }
 
 try {
@@ -49,21 +56,29 @@ try {
             guest_name VARCHAR(255) NOT NULL,
             companions INT DEFAULT 0,
             attendance ENUM('sim', 'nao') NOT NULL,
+            ceremony TINYINT(1) DEFAULT 0,
+            culto TINYINT(1) DEFAULT 0,
             message TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
+
+    // Garantir colunas novas em bancos existentes
+    try { $pdo->exec("ALTER TABLE rsvps ADD COLUMN IF NOT EXISTS ceremony TINYINT(1) DEFAULT 0"); } catch (Exception $e) {}
+    try { $pdo->exec("ALTER TABLE rsvps ADD COLUMN IF NOT EXISTS culto TINYINT(1) DEFAULT 0"); } catch (Exception $e) {}
     
     // Inserir confirmação
     $stmt = $pdo->prepare("
-        INSERT INTO rsvps (guest_name, companions, attendance, message)
-        VALUES (:guest_name, :companions, :attendance, :message)
+        INSERT INTO rsvps (guest_name, companions, attendance, ceremony, culto, message)
+        VALUES (:guest_name, :companions, :attendance, :ceremony, :culto, :message)
     ");
     
     $stmt->execute([
         ':guest_name' => $guestName,
         ':companions' => $companions,
         ':attendance' => $attendance,
+        ':ceremony' => $attendCeremony,
+        ':culto' => $attendCulto,
         ':message' => $message ?: null
     ]);
     
@@ -72,12 +87,16 @@ try {
     $totalPeople = ($attendance === 'sim') ? (1 + $companions) : 0;
     
     if ($attendance === 'sim') {
+        $events = [];
+        if ($attendCeremony) { $events[] = 'Cerimônia (14/12 15h)'; }
+        if ($attendCulto) { $events[] = 'Culto de gratidão (12/12 19h)'; }
+        $eventsText = $events ? ' | Eventos: ' . implode(' + ', $events) : '';
         if ($companions === 0) {
-            $messageText = 'Presença confirmada com sucesso! 🎉 (Você: 1 pessoa)';
+            $messageText = 'Presença confirmada com sucesso! 🎉 (Você: 1 pessoa)' . $eventsText;
         } else if ($companions === 1) {
-            $messageText = "Presença confirmada com sucesso! 🎉 (Você: 1 pessoa + {$companions} acompanhante = {$totalPeople} pessoas no total)";
+            $messageText = "Presença confirmada com sucesso! 🎉 (Você: 1 pessoa + {$companions} acompanhante = {$totalPeople} pessoas no total)" . $eventsText;
         } else {
-            $messageText = "Presença confirmada com sucesso! 🎉 (Você: 1 pessoa + {$companions} acompanhantes = {$totalPeople} pessoas no total)";
+            $messageText = "Presença confirmada com sucesso! 🎉 (Você: 1 pessoa + {$companions} acompanhantes = {$totalPeople} pessoas no total)" . $eventsText;
         }
     } else {
         $messageText = 'Registramos que você não poderá comparecer. Sentiremos sua falta! 😢';
@@ -91,6 +110,8 @@ try {
             'guestName' => $guestName,
             'companions' => $companions,
             'attendance' => $attendance,
+            'ceremony' => (int)$attendCeremony,
+            'culto' => (int)$attendCulto,
             'message' => $message,
             'createdAt' => date('Y-m-d H:i:s')
         ]

@@ -19,6 +19,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 
 try {
     $pdo = getDBConnection();
+    // Garantir colunas de eventos existem
+    try { $pdo->exec("ALTER TABLE rsvps ADD COLUMN IF NOT EXISTS ceremony TINYINT(1) DEFAULT 0"); } catch (Exception $e) {}
+    try { $pdo->exec("ALTER TABLE rsvps ADD COLUMN IF NOT EXISTS culto TINYINT(1) DEFAULT 0"); } catch (Exception $e) {}
     
     // Buscar todas as confirmações ordenadas por data (mais recentes primeiro)
     $stmt = $pdo->query("
@@ -27,6 +30,8 @@ try {
             guest_name as guestName,
             companions,
             attendance,
+            ceremony,
+            culto,
             message,
             created_at as createdAt
         FROM rsvps

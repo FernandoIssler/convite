@@ -206,6 +206,14 @@
                 <div class="stat-label">Total de Pessoas</div>
                 <div class="stat-value">${stats.totalPessoas}</div>
               </div>
+              <div class="stat-card">
+                <div class="stat-label">Cerimônia (pessoas)</div>
+                <div class="stat-value">${stats.ceremonyPessoas}</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Culto (pessoas)</div>
+                <div class="stat-value">${stats.cultoPessoas}</div>
+              </div>
             `;
             document.getElementById('stats-container').innerHTML = statsHTML;
           }
@@ -238,6 +246,10 @@
               const date = new Date(rsvp.createdAt).toLocaleString('pt-BR');
               const badgeClass = rsvp.attendance === 'sim' ? 'rsvp-badge--sim' : 'rsvp-badge--nao';
               const badgeText = rsvp.attendance === 'sim' ? '✅ Confirmado' : '❌ Não vai';
+              const eventos = rsvp.attendance === 'sim' ? [
+                rsvp.ceremony ? 'Cerimônia' : null,
+                rsvp.culto ? 'Culto' : null,
+              ].filter(Boolean).join(' + ') : 'Nenhum';
               
               return `
                 <div class="rsvp-item">
@@ -248,6 +260,7 @@
                   <div class="rsvp-meta">
                     <span>👥 Acompanhantes: ${rsvp.companions}</span>
                     <span>📅 ${date}</span>
+                    <span>📌 Eventos: ${eventos}</span>
                   </div>
                   ${rsvp.message ? `
                     <div class="rsvp-message">

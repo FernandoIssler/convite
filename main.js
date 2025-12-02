@@ -172,8 +172,10 @@ function initRsvp() {
   const copyHint = document.getElementById("copy-hint");
   const submitBtn = form?.querySelector('button[type="submit"]');
   const feedbackMessage = document.getElementById("rsvp-feedback");
+  const eventCeremony = /** @type {HTMLInputElement|null} */(document.getElementById("event-ceremony"));
+  const eventCulto = /** @type {HTMLInputElement|null} */(document.getElementById("event-culto"));
 
-  if (!toggle || !hiddenInput || !form || !preview) return;
+  if (!toggle || !hiddenInput || !form) return;
 
   // Alternar "Sim" / "Não"
   toggle.addEventListener("click", (event) => {
@@ -186,14 +188,33 @@ function initRsvp() {
     toggle.querySelectorAll(".pill-toggle__option").forEach((el) => {
       el.classList.toggle("is-active", el === btn);
     });
+
+    // Habilitar/desabilitar seleção de eventos conforme presença
+    const going = value === 'sim';
+    if (eventCeremony) {
+      eventCeremony.disabled = !going;
+      if (!going) eventCeremony.checked = false;
+    }
+    if (eventCulto) {
+      eventCulto.disabled = !going;
+      if (!going) eventCulto.checked = false;
+    }
   });
 
-  function buildMessage(guestName, companions, attendance, message) {
+  function buildMessage(guestName, companions, attendance, message, evCeremony, evCulto) {
     const nameValue = guestName?.trim() || "[Nome do convidado]";
     const companionsValue = parseInt(companions) || 0;
     const totalPeople = 1 + companionsValue; // Pessoa + acompanhantes
     const attendanceValue = attendance === "nao" ? "não poderei ir" : "confirmo minha presença";
     const customMessage = message?.trim() || "(sua mensagem aparecerá aqui)";
+
+    let eventosTexto = "";
+    if (attendance !== 'nao') {
+      const partes = [];
+      if (evCeremony) partes.push('Cerimônia (14/12 15h)');
+      if (evCulto) partes.push('Culto de gratidão (12/12 19h)');
+      eventosTexto = partes.length ? `\n\nEventos: ${partes.join(' + ')}` : '';
+    }
 
     let companionsText = "";
     if (companionsValue === 0) {
@@ -209,20 +230,21 @@ function initRsvp() {
 Eu, ${nameValue}, ${attendanceValue} na sua formatura de ${CONFIG.course}! 🎓
 
 ${companionsText}
+  ${eventosTexto}
 
-Mensagem: ${customMessage}`;
+  Mensagem: ${customMessage}`;
   }
 
   function showFeedback(message, isSuccess = true) {
     if (!feedbackMessage) return;
-    
+
     feedbackMessage.textContent = message;
     feedbackMessage.className = `rsvp-feedback ${isSuccess ? 'rsvp-feedback--success' : 'rsvp-feedback--error'}`;
     feedbackMessage.style.display = 'block';
-    
+
     // Scroll para o feedback
     feedbackMessage.scrollIntoView({ behavior: "smooth", block: "center" });
-    
+
     // Esconder após 5 segundos
     setTimeout(() => {
       feedbackMessage.style.display = 'none';
@@ -232,7 +254,7 @@ Mensagem: ${customMessage}`;
   // Enviar confirmação para a API
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
-    
+
     const guestName = /** @type {HTMLInputElement|null} */ (
       document.getElementById("guest-name")
     );
@@ -247,11 +269,18 @@ Mensagem: ${customMessage}`;
     const companionsValue = parseInt(companions?.value || "0");
     const attendanceValue = hiddenInput.value;
     const messageValue = msg?.value?.trim() || "";
+    const attendCeremony = !!eventCeremony?.checked;
+    const attendCulto = !!eventCulto?.checked;
 
     // Validação
     if (!nameValue) {
       showFeedback("Por favor, preencha seu nome.", false);
       guestName?.focus();
+      return;
+    }
+
+    if (attendanceValue === 'sim' && !attendCeremony && !attendCulto) {
+      showFeedback("Selecione ao menos um evento (Cerimônia e/ou Culto).", false);
       return;
     }
 
@@ -272,6 +301,8 @@ Mensagem: ${customMessage}`;
           guestName: nameValue,
           companions: companionsValue,
           attendance: attendanceValue,
+          attendCeremony,
+          attendCulto,
           message: messageValue || null,
         }),
       });
@@ -280,10 +311,12 @@ Mensagem: ${customMessage}`;
 
       if (data.success) {
         showFeedback(data.message, true);
-        
-        // Atualizar preview
-        preview.textContent = buildMessage(nameValue, companionsValue, attendanceValue, messageValue);
-        
+
+        // Atualizar preview (se existir)
+        if (preview) {
+          preview.textContent = buildMessage(nameValue, companionsValue, attendanceValue, messageValue, attendCeremony, attendCulto);
+        }
+
         // Limpar formulário após sucesso
         setTimeout(() => {
           form.reset();
@@ -291,14 +324,17 @@ Mensagem: ${customMessage}`;
           toggle.querySelectorAll(".pill-toggle__option").forEach((el, idx) => {
             el.classList.toggle("is-active", idx === 0);
           });
+          if (eventCeremony) { eventCeremony.disabled = false; eventCeremony.checked = false; }
+          if (eventCulto) { eventCulto.disabled = false; eventCulto.checked = false; }
         }, 2000);
       } else {
         showFeedback(data.error || "Erro ao processar confirmação.", false);
       }
     } catch (error) {
-      // Se não conseguir conectar à API, ainda mostra a mensagem gerada
       console.warn('Servidor não disponível, mostrando apenas preview:', error);
-      preview.textContent = buildMessage(nameValue, companionsValue, attendanceValue, messageValue);
+      if (preview) {
+        preview.textContent = buildMessage(nameValue, companionsValue, attendanceValue, messageValue, attendCeremony, attendCulto);
+      }
       showFeedback("Servidor offline. Mensagem gerada para você copiar e enviar manualmente.", false);
     } finally {
       // Reabilitar botão
@@ -334,11 +370,11 @@ Mensagem: ${customMessage}`;
 function generatePixEmv(cpf, name, city = "BRASILIA") {
   // Remove caracteres não numéricos do CPF
   const cleanCpf = cpf.replace(/\D/g, "");
-  
+
   // Limita o nome a 25 caracteres (padrão PIX)
   const merchantName = name.substring(0, 25).toUpperCase();
   const merchantCity = city.substring(0, 15).toUpperCase();
-  
+
   // Monta os campos do payload EMV
   const payloadFormatIndicator = "000201"; // ID 00 + tamanho 02 + valor 01
   const merchantAccountInfo = "26" + String(14 + cleanCpf.length + 2).padStart(2, "0") + "0014br.gov.bcb.pix01" + String(cleanCpf.length).padStart(2, "0") + cleanCpf; // ID 26 + tamanho + GUI + tamanho chave + chave
@@ -348,12 +384,12 @@ function generatePixEmv(cpf, name, city = "BRASILIA") {
   const merchantNameField = "59" + String(merchantName.length).padStart(2, "0") + merchantName; // ID 59 + tamanho + nome
   const merchantCityField = "60" + String(merchantCity.length).padStart(2, "0") + merchantCity; // ID 60 + tamanho + cidade
   const additionalDataField = "62070503***"; // ID 62 + tamanho 07 + template 05 + tamanho 02 + referência ***
-  
+
   // Monta o payload sem CRC
-  const payloadWithoutCrc = payloadFormatIndicator + merchantAccountInfo + merchantCategoryCode + 
-                            transactionCurrency + countryCode + merchantNameField + merchantCityField + 
-                            additionalDataField;
-  
+  const payloadWithoutCrc = payloadFormatIndicator + merchantAccountInfo + merchantCategoryCode +
+    transactionCurrency + countryCode + merchantNameField + merchantCityField +
+    additionalDataField;
+
   // Calcula CRC16 sobre o payload + campo 63 (sem o valor do CRC)
   const payloadForCrc = payloadWithoutCrc + "6304";
   const crc = calculateCRC16(payloadForCrc);
@@ -364,11 +400,11 @@ function generatePixEmv(cpf, name, city = "BRASILIA") {
 function calculateCRC16(data) {
   let crc = 0xffff;
   const polynomial = 0x1021;
-  
+
   for (let i = 0; i < data.length; i++) {
     const byte = data.charCodeAt(i);
     crc ^= (byte << 8);
-    
+
     for (let j = 0; j < 8; j++) {
       if (crc & 0x8000) {
         crc = ((crc << 1) ^ polynomial) & 0xffff;
@@ -377,7 +413,7 @@ function calculateCRC16(data) {
       }
     }
   }
-  
+
   return crc.toString(16).toUpperCase().padStart(4, "0");
 }
 
@@ -387,16 +423,16 @@ function initPix() {
   const copyBtn = document.getElementById("btn-copy-pix");
   const copyHint = document.getElementById("pix-copy-hint");
   const pixKey = document.getElementById("pix-key");
-  
+
   if (!qrCanvas || !copyBtn || !pixKey) return;
-  
+
   const pixCpf = "02482451558";
   const pixName = CONFIG.graduateName || "Fernando Issler Silva";
   const pixCity = "Cachoeira";
-  
+
   // Gera o código EMV do PIX
   const pixEmv = generatePixEmv(pixCpf, pixName, pixCity);
-  
+
   // Gera o QR code
   if (typeof QRCode !== "undefined") {
     QRCode.toCanvas(qrCanvas, pixEmv, {
@@ -412,7 +448,7 @@ function initPix() {
       }
     });
   }
-  
+
   // Copiar chave PIX
   if (copyBtn && navigator.clipboard) {
     copyBtn.addEventListener("click", async () => {
@@ -459,7 +495,135 @@ document.addEventListener("DOMContentLoaded", () => {
   initCountdown();
   initRsvp();
   initPix();
+  initMemoryGame();
   initSmoothScroll();
 });
+// --- Mini-game memória para liberar o PIX --- //
+function initMemoryGame() {
+  const gameEl = document.getElementById('pix-game');
+  const grid = document.getElementById('memory-grid');
+  const resetBtn = document.getElementById('pix-game-reset');
+  const hint = document.getElementById('memory-hint');
+  const reveal = document.getElementById('pix-reveal');
+  const donationText = document.getElementById('pix-donation-text');
+
+  if (!gameEl || !grid || !resetBtn || !hint || !reveal) return;
+
+  const symbols = ['🎓', '🥂', '📷', 'X', 'S2', 'Nando']; // 3 pairs
+  let deck = [];
+  let first = null;
+  let second = null;
+  let lock = false;
+  let moves = 0;
+  let matched = 0;
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function buildDeck() {
+    deck = shuffle([...symbols, ...symbols]);
+  }
+
+  function render() {
+    grid.innerHTML = '';
+    deck.forEach((s, idx) => {
+      const card = document.createElement('div');
+      card.className = 'memory-card';
+      card.dataset.symbol = s;
+      card.dataset.index = String(idx);
+      card.innerHTML = `
+        <div class="memory-card__inner">
+          <div class="memory-card__face front"></div>
+          <div class="memory-card__face back">${s}</div>
+        </div>`;
+      card.addEventListener('click', onCardClick);
+      grid.appendChild(card);
+    });
+    moves = 0;
+    matched = 0;
+    hint.textContent = `Jogadas: ${moves}`;
+  }
+
+  function onCardClick(e) {
+    if (lock) return;
+    const clicked = e.currentTarget;
+    if (clicked.classList.contains('matched') || clicked.classList.contains('flipped')) return;
+    clicked.classList.add('flipped');
+    if (!first) {
+      first = clicked;
+      return;
+    }
+    second = clicked;
+    lock = true;
+    moves += 1;
+    hint.textContent = `Jogadas: ${moves}`;
+
+    const a = first.dataset.symbol;
+    const b = second.dataset.symbol;
+
+    if (a === b) {
+      // match
+      setTimeout(() => {
+        first.classList.add('matched');
+        second.classList.add('matched');
+        first = null;
+        second = null;
+        lock = false;
+        matched += 1;
+        if (matched === symbols.length) {
+          gameWin();
+        }
+      }, 350);
+    } else {
+      // not match
+      setTimeout(() => {
+        first.classList.remove('flipped');
+        second.classList.remove('flipped');
+        first = null;
+        second = null;
+        lock = false;
+      }, 700);
+    }
+  }
+
+  function gameWin() {
+    // reveal PIX and donation text
+    reveal.style.display = 'block';
+    if (donationText) donationText.style.display = 'block';
+    // show a small congrats message
+    const msg = document.createElement('div');
+    msg.style.textAlign = 'center';
+    msg.style.marginTop = '8px';
+    msg.style.color = '#22c55e';
+    msg.textContent = 'Parabéns! Você desbloqueou a surpresa 🎉';
+    gameEl.appendChild(msg);
+    // disable further interaction
+    grid.querySelectorAll('.memory-card').forEach(c => c.classList.add('matched'));
+    // generate QR now (if initPix ran earlier it may have already created it)
+    try { initPix(); } catch (e) {}
+  }
+
+  function start() {
+    buildDeck();
+    render();
+  }
+
+  resetBtn.addEventListener('click', () => {
+    // remove any congrats message
+    const existing = gameEl.querySelector('div');
+    if (existing && existing.textContent && existing.textContent.includes('Parabéns')) existing.remove();
+    first = second = null;
+    lock = false;
+    start();
+  });
+
+  // initial start
+  start();
+}
 
 

@@ -903,10 +903,191 @@ textarea {
   color: #020617;
 }
 
+/* ---------- Escolha de eventos (checkbox chips) ---------- */
+.choice-toggle {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.choice {
+  position: relative;
+}
+
+.choice input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.choice__pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  background: rgba(15, 23, 42, 0.9);
+  min-width: 220px;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s, background 0.2s;
+  cursor: pointer;
+}
+
+.choice__icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: radial-gradient(circle at 30% 0, rgba(34, 197, 94, 0.3), rgba(15, 23, 42, 0.6));
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+.choice__text {
+  display: grid;
+  line-height: 1.1;
+}
+
+.choice__text strong {
+  font-size: 13px;
+  color: #e5e7eb;
+}
+
+.choice__text small {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.choice input:checked + .choice__pill {
+  background: linear-gradient(120deg, rgba(34, 197, 94, 0.18), rgba(34, 211, 238, 0.18));
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.35), 0 8px 22px rgba(34, 197, 94, 0.18);
+}
+
+.choice__pill:hover {
+  border-color: rgba(94, 234, 212, 0.6);
+}
+
+.choice input:disabled + .choice__pill {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* ---------- Card PIX ---------- */
 .card--pix {
   background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(34, 211, 238, 0.05));
   border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+/* ---------- PIX Game ---------- */
+.pix-game {
+  border: 1px dashed rgba(34, 197, 94, 0.35);
+  background: rgba(2, 6, 23, 0.5);
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.pix-game__title {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #e5e7eb;
+}
+
+.pix-game__desc {
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 10px;
+}
+
+.pix-game__canvas {
+  display: block;
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  margin: 0 auto 10px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(55, 65, 81, 0.9);
+  border-radius: 8px;
+}
+
+.pix-game__controls {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+
+.pix-game__hint {
+  text-align: center;
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.pix-locked-overlay {
+  display: none;
+}
+
+/* ---------- Memory game styles ---------- */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  justify-items: center;
+  align-items: center;
+  padding: 8px 4px;
+  max-width: 360px;
+  margin: 6px auto 0;
+}
+
+.memory-card {
+  width: 96px;
+  height: 96px;
+  perspective: 600px;
+  cursor: pointer;
+}
+
+.memory-card__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.45s;
+  transform-style: preserve-3d;
+}
+
+.memory-card.flipped .memory-card__inner {
+  transform: rotateY(180deg);
+}
+
+.memory-card__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  backface-visibility: hidden;
+  box-shadow: 0 6px 18px rgba(2,6,23,0.6);
+}
+
+.memory-card__face.back {
+  background: linear-gradient(120deg, rgba(34,211,238,0.08), rgba(74,222,128,0.06));
+  transform: rotateY(180deg);
+  font-size: 34px;
+}
+
+.memory-card__face.front {
+  background: rgba(15,23,42,0.95);
+  border: 1px solid rgba(55,65,81,0.9);
+}
+
+.memory-card.matched {
+  opacity: 0.9;
+  transform: scale(0.98);
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .memory-card { width: 86px; height: 86px; }
 }
 
 .pix-container {

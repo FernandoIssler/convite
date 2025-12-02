@@ -1,5 +1,5 @@
 <?php
-require_once '../config.php';
+require_once __DIR__ . '/load_config.php';
 
 // Permitir requisições de qualquer origem (CORS)
 header('Access-Control-Allow-Origin: *');

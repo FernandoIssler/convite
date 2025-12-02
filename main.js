@@ -419,6 +419,9 @@ function calculateCRC16(data) {
 
 // --- Inicializar PIX --- //
 function initPix() {
+  // Make initPix idempotent so calling it multiple times won't re-bind events
+  if (window._pixInitialized) return;
+  window._pixInitialized = true;
   const qrCanvas = document.getElementById("pix-qrcode");
   const copyBtn = document.getElementById("btn-copy-pix");
   const copyHint = document.getElementById("pix-copy-hint");
@@ -494,8 +497,11 @@ document.addEventListener("DOMContentLoaded", () => {
   applyConfig();
   initCountdown();
   initRsvp();
-  initPix();
-  initMemoryGame();
+  
+  setTimeout(() => {
+    initMemoryGame();
+  }, 500); // dá tempo do DOM desenhar no Hostinger
+  
   initSmoothScroll();
 });
 // --- Mini-game memória para liberar o PIX --- //
@@ -509,7 +515,7 @@ function initMemoryGame() {
 
   if (!gameEl || !grid || !resetBtn || !hint || !reveal) return;
 
-  const symbols = ['🎓', '🥂', '📷', 'X', 'S2', 'Nando']; // 3 pairs
+  const symbols = ['🎓', '🥂', '📷', '🧑🏻‍💻', '✅', '💻']; // 6 pairs
   let deck = [];
   let first = null;
   let second = null;
@@ -625,5 +631,3 @@ function initMemoryGame() {
   // initial start
   start();
 }
-
-
